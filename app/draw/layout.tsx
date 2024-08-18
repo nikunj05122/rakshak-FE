@@ -1,12 +1,12 @@
 import React, { ReactNode } from "react";
 import Layout from "@/components/commonComponents/layout";
 
-type DashboardLayoutProps = {
+type DrawLayoutProps = {
     children: ReactNode;
 };
 
-const DashboardLayout = ({ children }: DashboardLayoutProps) => {
+const DrawLayout = ({ children }: DrawLayoutProps) => {
     return <Layout>{children}</Layout>;
 };
 
-export default DashboardLayout;
+export default DrawLayout;
