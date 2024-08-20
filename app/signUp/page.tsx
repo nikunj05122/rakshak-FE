@@ -59,8 +59,8 @@ export default function signUp() {
         console.log("dasasd", data);
     }
     return (
-        <div className="grid laptop:grid-cols-2 laptop:divide-x min-h-screen w-full bg-muted/40 primary-color">
-            <div className="hidden laptop:block h-screen ">
+        <div className="grid md:grid-cols-2 md:divide-x min-h-screen w-full bg-muted/40 primary-color">
+            <div className="hidden md:block h-screen ">
                 <Image
                     src="/img/signUp-cover.jpeg"
                     className="h-screen w-full object-cover p-4 rounded-3xl"
@@ -82,7 +82,7 @@ export default function signUp() {
                             onSubmit={form.handleSubmit(onSubmit)} //
                             className=""
                         >
-                            <div className="grid laptop:grid-cols-2 gap-4">
+                            <div className="grid md:grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
                                     name="firstName"

@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import { useState } from "react";
 import { z } from "zod";
 import Image from "next/image";
 import {
@@ -18,10 +17,15 @@ import {
 } from "@/components/ui/input-otp";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useDispatch, useSelector } from "react-redux";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { loginAsync, getAuthSelector } from "@/redux/slice/auth";
+import { AppDispatch } from "@/redux/store";
 
 const EmailFormSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -36,7 +40,10 @@ const NumberFormSchema = z.object({
 });
 
 export default function login() {
-    const [Loading, setLoading] = useState<boolean>(false);
+    const router = useRouter();
+    const { toast } = useToast();
+    const auth = useSelector(getAuthSelector);
+    const dispatch = useDispatch<AppDispatch>();
 
     const emailForm = useForm<z.infer<typeof EmailFormSchema>>({
         resolver: zodResolver(EmailFormSchema),
@@ -47,8 +54,21 @@ export default function login() {
     });
 
     function onEmailSubmit(data: z.infer<typeof EmailFormSchema>) {
-        setLoading(true);
-        console.log("dasasd", data);
+        dispatch(loginAsync(data))
+            .unwrap()
+            .then((response) => {
+                toast({
+                    description: "You are loged in.",
+                });
+                router.push("/dashboard");
+            })
+            .catch((error) => {
+                toast({
+                    variant: "destructive",
+                    title: "Unauthorized user.",
+                    description: "Please provide right credentials.",
+                });
+            });
     }
 
     const numberForm = useForm<z.infer<typeof NumberFormSchema>>({
@@ -60,12 +80,30 @@ export default function login() {
     });
 
     function onNumberSubmit(data: z.infer<typeof NumberFormSchema>) {
-        setLoading(true);
-        console.log("dasasd", data);
+        dispatch(
+            loginAsync({
+                number: `+91${data.number}`,
+                pin: data.pin,
+            })
+        )
+            .unwrap()
+            .then((response) => {
+                toast({
+                    description: "You are loged in.",
+                });
+                router.push("/dashboard");
+            })
+            .catch((error) => {
+                toast({
+                    variant: "destructive",
+                    title: "Unauthorized user.",
+                    description: "Please provide right credentials.",
+                });
+            });
     }
     return (
-        <div className="grid laptop:grid-cols-2 laptop:divide-x min-h-screen w-full bg-muted/40 primary-color">
-            <div className="flex flex-col justify-center h-screen px-10 ">
+        <div className="grid md:grid-cols-2 md:divide-x min-h-screen w-full bg-muted/40 primary-color">
+            <div className="flex flex-col justify-center h-screen px-10">
                 <h1 className="text-5xl font-bold text-center">
                     Welcome back!
                 </h1>
@@ -158,9 +196,9 @@ export default function login() {
                                         <Button
                                             type="submit"
                                             className="outline w-96 rounded-full hover:bg-white hover:outline-slate-950 hover:text-slate-950"
-                                            disabled={Loading}
+                                            disabled={auth.isLoading}
                                         >
-                                            {Loading && (
+                                            {auth.isLoading && (
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                             )}
                                             Submit
@@ -248,9 +286,9 @@ export default function login() {
                                         <Button
                                             type="submit"
                                             className="outline w-96 rounded-full hover:bg-white hover:outline-slate-950 hover:text-slate-950"
-                                            disabled={Loading}
+                                            disabled={auth.isLoading}
                                         >
-                                            {Loading && (
+                                            {auth.isLoading && (
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                             )}
                                             Submit
@@ -273,7 +311,7 @@ export default function login() {
                     </a>
                 </div>
             </div>
-            <div className="hidden laptop:block h-screen ">
+            <div className="hidden md:block h-screen ">
                 <Image
                     src="/img/signUp-cover.jpeg"
                     className="h-screen w-full object-cover p-4 rounded-3xl"
