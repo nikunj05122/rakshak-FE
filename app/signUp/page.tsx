@@ -18,9 +18,14 @@ import {
 } from "@/components/ui/input-otp";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { AppDispatch } from "@/redux/store";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useToast } from "@/components/ui/use-toast";
+import { signUpAsync, getAuthSelector } from "@/redux/slice/auth";
+import { useDispatch, useSelector } from "react-redux";
 
 const FormSchema = z.object({
     firstName: z.string().min(4, {
@@ -34,13 +39,16 @@ const FormSchema = z.object({
         .string()
         .length(10, { message: "Must be exactly 10 characters long" }),
     pin: z.string().length(6, { message: "Must be exactly 6 characters long" }),
-    confirmPin: z
+    pinConfirm: z
         .string()
         .length(6, { message: "Must be exactly 6 characters long" }),
 });
 
 export default function signUp() {
-    const [Loading, setLoading] = useState<boolean>(false);
+    const router = useRouter();
+    const { toast } = useToast();
+    const auth = useSelector(getAuthSelector);
+    const dispatch = useDispatch<AppDispatch>();
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -50,13 +58,31 @@ export default function signUp() {
             email: "",
             number: "",
             pin: "",
-            confirmPin: "",
+            pinConfirm: "",
         },
     });
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
-        setLoading(true);
-        console.log("dasasd", data);
+        dispatch(
+            signUpAsync({
+                ...data,
+                number: `+91${data.number}`,
+            })
+        )
+            .unwrap()
+            .then((response) => {
+                toast({
+                    description: "You are signup in.",
+                });
+                router.push("/dashboard");
+            })
+            .catch((error) => {
+                toast({
+                    variant: "destructive",
+                    title: "Unauthorized user.",
+                    description: "Please provide right credentials.",
+                });
+            });
     }
     return (
         <div className="grid md:grid-cols-2 md:divide-x min-h-screen w-full bg-muted/40 primary-color">
@@ -201,14 +227,14 @@ export default function signUp() {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="confirmPin"
+                                    name="pinConfirm"
                                     render={({ field }) => (
                                         <FormItem className="pt-4">
                                             <FormLabel>Confirm Pin*</FormLabel>
                                             <FormControl>
                                                 <InputOTP
                                                     maxLength={6}
-                                                    id="confirmPin"
+                                                    id="pinConfirm"
                                                     {...field}
                                                 >
                                                     <InputOTPGroup>
@@ -252,9 +278,9 @@ export default function signUp() {
                                 <Button
                                     type="submit"
                                     className="outline w-96 rounded-full hover:bg-white hover:outline-slate-950 hover:text-slate-950"
-                                    disabled={Loading}
+                                    disabled={auth.isLoading}
                                 >
-                                    {Loading && (
+                                    {auth.isLoading && (
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     )}
                                     Submit

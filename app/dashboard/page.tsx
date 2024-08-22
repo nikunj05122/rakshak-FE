@@ -7,21 +7,31 @@ import Map, {
     NavigationControl,
     ScaleControl,
 } from "react-map-gl";
+import Image from "next/image";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Search } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import LocationCard from "@/components/commonComponents/dashboard/locationCard";
-import Image from "next/image";
+import {
+    getOrganizationSelector,
+    searchOrganizationAsync,
+} from "@/redux/slice/organisation";
+import { AppDispatch } from "@/redux/store";
 
 const Map_Box_Token = process.env.NEXT_PUBLIC_MAP_BOX_TOKEN;
 
 export default function DashboardPage() {
+    const dispatch = useDispatch<AppDispatch>();
+    const organization = useSelector(getOrganizationSelector);
+
     const [viewport, setViewport] = useState<{
         latitude: number;
         longitude: number;
         zoom: number;
     } | null>(null);
+
     useEffect(() => {
         navigator.geolocation.getCurrentPosition((pos) => {
             setViewport({
@@ -31,6 +41,10 @@ export default function DashboardPage() {
             });
         });
     }, []);
+
+    const handleSearch = (name: string) => {
+        if (name !== "") dispatch(searchOrganizationAsync({ name }));
+    };
 
     return (
         <>
@@ -60,10 +74,13 @@ export default function DashboardPage() {
                                         type="search"
                                         placeholder="Search Location..."
                                         className="w-[290px] appearance-none bg-background pl-8 shadow-none"
+                                        onChange={(e) =>
+                                            handleSearch(e.target.value)
+                                        }
                                     />
                                 </div>
                             </form>
-                            {/* <div className="mt-1.5 rounded overflow-auto w-[306px]  h-[270px]">
+                            <div className="mt-1.5 rounded overflow-auto w-[306px]  h-[270px]">
                                 <LocationCard
                                     text="Puna Police Station"
                                     distance="2.5 Km"
@@ -99,7 +116,7 @@ export default function DashboardPage() {
                                     distance="2.5 Km"
                                     color={"#3E998F"}
                                 />
-                            </div> */}
+                            </div>
                         </div>
                         <ScaleControl />
                         <GeolocateControl />

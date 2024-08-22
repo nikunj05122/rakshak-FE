@@ -18,6 +18,7 @@ import {
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { AppDispatch } from "@/redux/store";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -25,7 +26,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { loginAsync, getAuthSelector } from "@/redux/slice/auth";
-import { AppDispatch } from "@/redux/store";
 
 const EmailFormSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
