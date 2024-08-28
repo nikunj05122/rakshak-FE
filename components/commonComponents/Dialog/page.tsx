@@ -1,7 +1,7 @@
-import * as React from "react";
-import { useState } from "react";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import * as React from 'react';
+import { useState } from 'react';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,29 +9,28 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { CircleX } from "lucide-react";
+} from '@/components/ui/select';
 
 // Zod schema for form validation
 const userSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email"),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Please enter valid email'),
   mobileNumber: z
     .string()
-    .regex(/^\d{10}$/, "Mobile number must be exactly 10 digits"),
-  designation: z.string().min(1, "Designation is required"),
-  type: z.enum(["Super Admin", "Admin", "User", "Officer"], {
-    errorMap: () => ({ message: "Type is required" }),
+    .regex(/^\d{10}$/, 'Mobile number must be exactly 10 digits'),
+  designation: z.string().min(1, 'Designation is required'),
+  type: z.enum(['Super Admin', 'Admin', 'User', 'Officer'], {
+    errorMap: () => ({ message: 'Please select type' }),
   }),
 });
 
@@ -47,12 +46,12 @@ type Errors = {
 
 export default function CardWithForm({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    mobileNumber: "",
-    designation: "",
-    type: "",
+    firstName: '',
+    lastName: '',
+    email: '',
+    mobileNumber: '',
+    designation: '',
+    type: '',
   });
 
   const [errors, setErrors] = useState<Errors>({}); // Use the Errors type
@@ -95,7 +94,7 @@ export default function CardWithForm({ onClose }: { onClose: () => void }) {
       setErrors(errorMessages as Errors); // Ensure errorMessages matches the Errors type
     } else {
       // If validation passes, handle the form submission (e.g., send data to server)
-      console.log("Form Submitted", formData);
+      console.log('Form Submitted', formData);
       setErrors({});
       onClose(); // Close modal on successful submission
     }
@@ -107,8 +106,8 @@ export default function CardWithForm({ onClose }: { onClose: () => void }) {
       <div className="fixed inset-0 z-40 bg-black/50" onClick={onClose} />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
-        <Card className="w-full max-w-[500px] max-h-[80vh] overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center m-2">
+        <Card className="w-full max-w-[500px] max-h-[75vh] overflow-y-auto">
           <CardHeader>
             <div>
               <CardTitle>Create User</CardTitle>
@@ -116,9 +115,6 @@ export default function CardWithForm({ onClose }: { onClose: () => void }) {
                 Create your new user in one-click.
               </CardDescription>
             </div>
-            {/* <div>
-              <CircleX className="h-6 w-6 cursor-pointer" onClick={onClose} />
-            </div> */}
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
